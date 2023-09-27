@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTaskDto, FilterDto, SortDto } from './dto/task.dto';
+import { CreateTaskDto, QueryDto } from './dto/task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './entities/task.entity';
 import { Repository } from 'typeorm';
@@ -37,23 +37,24 @@ export class TasksService {
     return this.taskRepository.save(newTask);
   }
 
-  async findAll(
-    sort?: SortDto,
-    filter?: FilterDto,
-    page = 1,
-    pageSize = 10,
-  ): Promise<{
+  async findAll(query: QueryDto): Promise<{
     data: TaskEntity[];
     nextPage?: number;
     previousPage?: number;
     maxPage: number;
     pageSize: number;
   }> {
+    const {
+      isCompleted,
+      order = 'DESC',
+      by = 'createdAt',
+      pageSize,
+    } = query || {};
+    let { page } = query || {};
     if (!page || page < 1) {
       page = 1;
     }
     const queryBuilder = this.taskRepository.createQueryBuilder('task');
-    const { by = 'createdAt', order = 'DESC' } = sort || {};
 
     queryBuilder.skip();
 
@@ -63,9 +64,9 @@ export class TasksService {
         queryBuilder.addOrderBy('task.createdAt', 'DESC');
       }
     }
-    if (filter?.isCompleted !== undefined) {
+    if (isCompleted !== undefined) {
       queryBuilder.andWhere('task.isCompleted = :completed', {
-        completed: filter.isCompleted,
+        completed: isCompleted,
       });
     }
     const totalCount = await queryBuilder.getCount();

@@ -2,12 +2,14 @@ import {
   IsBoolean,
   IsEnum,
   IsIn,
+  IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
+  Min,
 } from 'class-validator';
 import { Priority } from '../entities/task.entity';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateTaskDto {
   @IsString()
@@ -19,7 +21,7 @@ export class CreateTaskDto {
   priority?: Priority;
 }
 
-export class SortDto {
+export class QueryDto {
   @IsOptional()
   @IsIn(['createdAt', 'dueDate', 'priority'])
   by?: string;
@@ -27,11 +29,21 @@ export class SortDto {
   @IsOptional()
   @IsIn(['ASC', 'DESC'])
   order?: 'ASC' | 'DESC';
-}
 
-export class FilterDto {
   @IsOptional()
   @Transform(({ value }) => [true, 'true'].includes(value))
   @IsBoolean()
   isCompleted?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  page?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
+  pageSize?: number;
 }
