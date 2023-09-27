@@ -52,10 +52,19 @@ export const ListView = ({
     const updateBody: UpdateTask = {
       description: editedTaskDescription,
     };
-    updateTask(editingTaskId, updateBody).catch((error) => {
-      console.log("failed to save edited tasks", error);
-      setTasks(preEditTasks);
-    });
+    updateTask(editingTaskId, updateBody)
+      .then((result) => {
+        setTasks(
+          tasks?.map((t) => {
+            if (t?.id == result?.id) return result;
+            return t;
+          })
+        );
+      })
+      .catch((error) => {
+        console.log("failed to save edited tasks", error);
+        setTasks(preEditTasks);
+      });
     setTasks(
       tasks?.map((t) => {
         if (t?.id == editingTaskId)

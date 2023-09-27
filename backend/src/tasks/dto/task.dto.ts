@@ -9,10 +9,11 @@ import {
   Min,
 } from 'class-validator';
 import { Priority } from '../entities/task.entity';
-import { Transform, Type } from 'class-transformer';
+import { Transform, TransformFnParams, Type } from 'class-transformer';
 
 export class CreateTaskDto {
   @IsString()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsNotEmpty({ message: 'Please provide description for the task.' })
   description: string;
 
@@ -22,6 +23,7 @@ export class CreateTaskDto {
 }
 export class UpdateDto {
   @IsString()
+  @Transform(({ value }: TransformFnParams) => value?.trim())
   @IsNotEmpty({ message: 'Please provide description for the task.' })
   description: string;
 
