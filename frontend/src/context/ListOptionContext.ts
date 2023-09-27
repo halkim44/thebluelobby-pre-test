@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import { IListOptionsLocalStorage, updateData } from "../utils/localStorage";
 export enum FilterTypes {
   "ALL" = "ALL",
   "PENDING" = "PENDING",
@@ -42,30 +43,48 @@ const ListOptionContext = createContext<
 >(undefined);
 
 function listOptionReducer(state: IListOption, action: IAction) {
-  switch (action.type) {
-    case "update-options": {
-      return {
-        ...state,
-        ...action.payload,
+  let newContext: IListOption;
+  try {
+    switch (action.type) {
+      case "update-options": {
+        newContext = {
+          ...state,
+          ...action.payload,
+        };
+        return newContext;
+      }
+      case "replace-options": {
+        newContext = {
+          ...listOptionInitial,
+          ...action.payload,
+        };
+        return newContext;
+      }
+      case "increment-page": {
+        newContext = {
+          ...state,
+          page: state.page + 1,
+        };
+        return newContext;
+      }
+      case "reset": {
+        newContext = listOptionInitial;
+        return newContext;
+      }
+      default: {
+        throw new Error(`Unhandled action type: ${action.type}`);
+      }
+    }
+  } finally {
+    if (newContext) {
+      const localStorageData: IListOptionsLocalStorage = {
+        filter: newContext?.filter,
+        sort: newContext?.sort,
       };
-    }
-    case "replace-options": {
-      return {
-        ...listOptionInitial,
-        ...action.payload,
-      };
-    }
-    case "increment-page": {
-      return {
-        ...state,
-        page: state.page + 1,
-      };
-    }
-    case "reset": {
-      return listOptionInitial;
-    }
-    default: {
-      throw new Error(`Unhandled action type: ${action.type}`);
+      updateData<IListOptionsLocalStorage>(
+        "list-options-context",
+        () => localStorageData
+      );
     }
   }
 }
