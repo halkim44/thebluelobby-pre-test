@@ -1,5 +1,5 @@
 import { HttpMethod, initFetch } from "../utils/fetch";
-import { CreateTask, Task } from "../types/tasks";
+import { CreateTask, Task, UpdateTask } from "../types/tasks";
 
 const fetchCall = initFetch("http://localhost:3000");
 
@@ -60,6 +60,12 @@ export const getTasks = (
 
 export const createTask = (body: CreateTask) => {
   return fetchCall<Task>(HttpMethod.POST, `/tasks`, {
+    body,
+  });
+};
+
+export const updateTask = (id: string, body: UpdateTask) => {
+  return fetchCall<Task>(HttpMethod.PATCH, `/tasks/${id}`, {
     body,
   });
 };

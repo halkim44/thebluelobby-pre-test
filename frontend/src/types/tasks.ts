@@ -25,3 +25,9 @@ export interface CreateTask {
 
   priority?: Priority;
 }
+
+export interface UpdateTask {
+  description?: string;
+
+  priority?: Priority;
+}

@@ -11,12 +11,18 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 
-import { Priority } from "../types/tasks";
+import { Priority, UpdateTask } from "../types/tasks";
 import { TaskSimplified } from "./FiterableTaskTable";
-import { completeTask, deleteTask, uncompleteTask } from "../api/tasks";
+import {
+  completeTask,
+  deleteTask,
+  uncompleteTask,
+  updateTask,
+} from "../api/tasks";
 import { Dispatch, useEffect, useState } from "react";
 import useInfiniteScroll from "./InfiniteScroll";
 import { useListOption } from "../context/ListOptionContext";
+import TextField from "@mui/material/TextField";
 
 export const ListView = ({
   tasks,
@@ -28,9 +34,37 @@ export const ListView = ({
   maxPage: number;
 }) => {
   const [hasMore, setHasMore] = useState<boolean>(false);
+  const [editedTaskDescription, setEditedTaskDescription] = useState("");
+  const [editingTaskId, setEditingTaskId] = useState(null);
+
   const [loaderRef, converge, setConverge] = useInfiniteScroll();
 
   const { state, dispatch } = useListOption();
+
+  const startEditing = (taskId, description) => {
+    setEditingTaskId(taskId);
+    setEditedTaskDescription(description);
+  };
+
+  const saveEdit = () => {
+    const preEditTasks = tasks;
+
+    const updateBody: UpdateTask = {
+      description: editedTaskDescription,
+    };
+    updateTask(editingTaskId, updateBody).catch((error) => {
+      console.log("failed to save edited tasks", error);
+      setTasks(preEditTasks);
+    });
+    setTasks(
+      tasks?.map((t) => {
+        if (t?.id == editingTaskId)
+          return { ...t, description: updateBody?.description };
+        return t;
+      })
+    );
+    startEditing(null, "");
+  };
 
   useEffect(() => {
     if (converge && hasMore) {
@@ -107,7 +141,33 @@ export const ListView = ({
                         : {}),
                     }}
                   >
-                    {task.description}
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditing(task.id, task.description);
+                      }}
+                    >
+                      {editingTaskId === task.id ? (
+                        <TextField
+                          type="text"
+                          size="small"
+                          fullWidth
+                          autoFocus
+                          value={editedTaskDescription}
+                          onChange={(e) =>
+                            setEditedTaskDescription(e.target.value)
+                          }
+                          onBlur={() => saveEdit()}
+                          onKeyUp={(e) => {
+                            if (e.key === "Enter") {
+                              saveEdit();
+                            }
+                          }}
+                        />
+                      ) : (
+                        task.description
+                      )}
+                    </span>
                   </TableCell>
                   <TableCell
                     align="right"
