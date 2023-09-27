@@ -19,6 +19,10 @@ export class TasksController {
   create(@Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.create(createTaskDto);
   }
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() createTaskDto: CreateTaskDto) {
+    return this.tasksService.updateTask(id, createTaskDto);
+  }
 
   @Get()
   findAll(@Query() query: QueryDto) {

@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTaskDto, QueryDto } from './dto/task.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateTaskDto, QueryDto, UpdateDto } from './dto/task.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from './entities/task.entity';
 import { Repository } from 'typeorm';
@@ -35,6 +35,26 @@ export class TasksService {
       newTask.priority = createTaskDto?.priority;
 
     return this.taskRepository.save(newTask);
+  }
+
+  async updateTask(id: string, updateTaskDto: UpdateDto): Promise<TaskEntity> {
+    const existingTask = await this.taskRepository.findOne({
+      where: { id: id },
+    });
+
+    if (!existingTask) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+
+    if (updateTaskDto.description !== undefined) {
+      existingTask.description = updateTaskDto.description;
+    }
+
+    if (updateTaskDto.priority !== undefined) {
+      existingTask.priority = updateTaskDto.priority;
+    }
+
+    return this.taskRepository.save(existingTask);
   }
 
   async findAll(query: QueryDto): Promise<{

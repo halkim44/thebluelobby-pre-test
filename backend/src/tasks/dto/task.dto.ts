@@ -20,6 +20,15 @@ export class CreateTaskDto {
   @IsOptional()
   priority?: Priority;
 }
+export class UpdateDto {
+  @IsString()
+  @IsNotEmpty({ message: 'Please provide description for the task.' })
+  description: string;
+
+  @IsEnum(Priority)
+  @IsOptional()
+  priority?: Priority;
+}
 
 export class QueryDto {
   @IsOptional()
