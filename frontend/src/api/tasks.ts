@@ -12,20 +12,18 @@ const generateTaskListUrl = (
   pageSize?: number
 ) => {
   const queryParams = [];
-  const filterKeys = Object.keys(filter || {});
 
-  if (filterKeys?.length) {
-    filterKeys.forEach((key) => {
-      queryParams.push(`filter[${key}]=${filter[key]}`);
-    });
+  if (filter?.isCompleted !== undefined) {
+    queryParams.push(`isCompleted=${filter.isCompleted}`);
   }
 
-  const sortKeys = Object.keys(sort || {});
-  if (sortKeys?.length) {
-    sortKeys.forEach((key) => {
-      queryParams.push(`sort[${key}]=${sort[key]}`);
-    });
+  if (sort.by?.length) {
+    queryParams.push(`by=${sort.by}`);
   }
+  if (sort.order?.length) {
+    queryParams.push(`order=${sort.order}`);
+  }
+
   if (page) {
     queryParams.push(`page=${page}`);
   }

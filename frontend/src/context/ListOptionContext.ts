@@ -16,7 +16,7 @@ const listOptionInitial = {
   filter: FilterTypes.ALL,
   sort: {
     by: SortTypes.CREATION_DATE,
-    isAscendingOrder: true,
+    isAscendingOrder: false,
   },
   page: 1,
   pageSize: 12,
