@@ -122,9 +122,9 @@ export const ListOptionMenu = () => {
                   <ListItemIcon>
                     {state?.sort.by === key &&
                       (state?.sort.isAscendingOrder ? (
-                        <ArrowDownwardIcon />
-                      ) : (
                         <ArrowUpwardIcon />
+                      ) : (
+                        <ArrowDownwardIcon />
                       ))}
                   </ListItemIcon>
                   {sorter[key].name}

@@ -9,7 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto, FilterDto, SortDto } from './dto/task.dto';
+import { CreateTaskDto, QueryDto } from './dto/task.dto';
 
 @Controller('tasks')
 export class TasksController {
@@ -19,22 +19,14 @@ export class TasksController {
   create(@Body() createTaskDto: CreateTaskDto) {
     return this.tasksService.create(createTaskDto);
   }
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() createTaskDto: CreateTaskDto) {
+    return this.tasksService.updateTask(id, createTaskDto);
+  }
 
   @Get()
-  findAll(
-    @Query('sort') sort: SortDto,
-    @Query('filter') filter: FilterDto,
-    @Query('page') page: string,
-    @Query('pageSize') pageSize: string,
-  ) {
-    return this.tasksService.findAll(
-      sort,
-      filter,
-      ...[
-        !Number.isNaN(+page) ? +page : undefined,
-        !Number.isNaN(+pageSize) ? +pageSize : undefined,
-      ],
-    );
+  findAll(@Query() query: QueryDto) {
+    return this.tasksService.findAll(query);
   }
 
   @Patch(':id/complete')

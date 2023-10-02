@@ -1,5 +1,5 @@
 import { HttpMethod, initFetch } from "../utils/fetch";
-import { CreateTask, Task } from "../types/tasks";
+import { CreateTask, Task, UpdateTask } from "../types/tasks";
 
 const fetchCall = initFetch("http://localhost:3000");
 
@@ -12,20 +12,18 @@ const generateTaskListUrl = (
   pageSize?: number
 ) => {
   const queryParams = [];
-  const filterKeys = Object.keys(filter || {});
 
-  if (filterKeys?.length) {
-    filterKeys.forEach((key) => {
-      queryParams.push(`filter[${key}]=${filter[key]}`);
-    });
+  if (filter?.isCompleted !== undefined) {
+    queryParams.push(`isCompleted=${filter.isCompleted}`);
   }
 
-  const sortKeys = Object.keys(sort || {});
-  if (sortKeys?.length) {
-    sortKeys.forEach((key) => {
-      queryParams.push(`sort[${key}]=${sort[key]}`);
-    });
+  if (sort.by?.length) {
+    queryParams.push(`by=${sort.by}`);
   }
+  if (sort.order?.length) {
+    queryParams.push(`order=${sort.order}`);
+  }
+
   if (page) {
     queryParams.push(`page=${page}`);
   }
@@ -62,6 +60,12 @@ export const getTasks = (
 
 export const createTask = (body: CreateTask) => {
   return fetchCall<Task>(HttpMethod.POST, `/tasks`, {
+    body,
+  });
+};
+
+export const updateTask = (id: string, body: UpdateTask) => {
+  return fetchCall<Task>(HttpMethod.PATCH, `/tasks/${id}`, {
     body,
   });
 };
